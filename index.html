@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cipher Subscriptions</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6; /* Equivalent to bg-gray-100 */
+        }
+        /* Custom styles for the colorful title gradient */
+        .colorful-title {
+            background: linear-gradient(to right, #8b5cf6, #ec4899, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="min-h-screen bg-gray-100 flex flex-col items-center py-10 px-4 font-sans">
+            <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-4xl mb-10">
+                <h1 class="text-3xl font-extrabold mb-6 text-center colorful-title">
+                    Cipher Subscriptions
+                </h1>
+
+                <!-- Google SSO/Logout Section -->
+                <div id="auth-section" class="mb-6 p-4 bg-blue-50 rounded-lg text-blue-800 text-sm break-words flex flex-col items-start">
+                    <p id="user-status" class="mb-2"></p>
+                    <div id="auth-buttons" class="flex justify-center w-full">
+                        <button id="signin-google" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition duration-150 ease-in-out shadow-md">
+                            <img src="https://brandlogos.net/wp-content/uploads/2025/05/google_icon_2025-logo_brandlogos.net_qm5ka-300x307.png" alt="Google logo" class="w-5 h-5 mr-2" onerror="this.onerror=null;this.src='https://placehold.co/20x20/cccccc/000000?text=G';">
+                            Sign in with Google
+                        </button>
+                        <button id="signout-google" class="hidden inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out ml-4">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 9.414V14h3a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2a1 1 0 011-1h3V9.414L3.293 6.707A1 1 0 013 6V3zm8 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                            </svg>
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Add/Edit Entry Form -->
+                <form id="entry-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <input type="hidden" id="entry-id">
+                    <div class="col-span-1">
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                            Software/Subscription Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="name" name="name" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                    </div>
+                    <div class="col-span-1">
+                        <label for="vendor" class="block text-sm font-medium text-gray-700 mb-1">
+                            Vendor
+                        </label>
+                        <input type="text" id="vendor" name="vendor" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div class="col-span-1">
+                        <label for="key" class="block text-sm font-medium text-gray-700 mb-1">
+                            License Key/ID
+                        </label>
+                        <input type="text" id="key" name="key" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div class="col-span-1">
+                        <label for="cost" class="block text-sm font-medium text-gray-700 mb-1">
+                            Annual Cost (£)
+                        </label>
+                        <input type="number" id="cost" name="cost" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" min="0" step="0.01">
+                    </div>
+                    <div class="col-span-1">
+                        <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">
+                            Start Date <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" id="startDate" name="startDate" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                    </div>
+                    <div class="col-span-1">
+                        <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">
+                            End Date
+                        </label>
+                        <input type="date" id="endDate" name="endDate" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div class="col-span-1 flex items-center mt-5">
+                        <input type="checkbox" id="willRenew" name="willRenew" class="h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="willRenew" class="ml-2 block text-sm font-medium text-gray-700">
+                            Will it auto renew?
+                        </label>
+                    </div>
+                    <div id="renewalReminderDateGroup" class="col-span-1" style="display: none;">
+                        <label for="renewalReminderDate" class="block text-sm font-medium text-gray-700 mb-1">
+                            Renewal Reminder Date <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" id="renewalReminderDate" name="renewalReminderDate" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div class="col-span-2 flex items-center mt-5">
+                        <input type="checkbox" id="notResponsible" name="notResponsible" class="h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="notResponsible" class="ml-2 block text-sm font-medium text-gray-700">
+                            I am not responsible for this account
+                        </label>
+                    </div>
+                    <div id="responsiblePersonEmailGroup" class="col-span-2" style="display: none;">
+                        <label for="responsiblePersonEmail" class="block text-sm font-medium text-gray-700 mb-1">
+                            Email of responsible person <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email" id="responsiblePersonEmail" name="responsiblePersonEmail" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <div class="col-span-2">
+                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
+                            Notes
+                        </label>
+                        <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                    </div>
+                    <div class="col-span-2 flex justify-end space-x-3">
+                        <button type="submit" id="submit-button" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                            Add Entry
+                        </button>
+                        <button type="button" id="cancel-edit-button" class="hidden inline-flex justify-center py-2 px-6 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                            Cancel Edit
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Licenses List -->
+            <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-4xl">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Your Software & Subscriptions</h2>
+                <div id="licenses-list-container" class="overflow-x-auto">
+                    <p id="no-licenses-message" class="text-center text-gray-600">Loading licenses...</p>
+                    <table id="licenses-table" class="min-w-full divide-y divide-gray-200 hidden">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Name
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Vendor
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Cost
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Dates
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Responsible
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="licenses-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- License rows will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Custom Modal for Messages -->
+            <div id="custom-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+                <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Notification</h3>
+                    <p id="modal-content" class="text-sm text-gray-700 mb-6"></p>
+                    <div class="flex justify-end">
+                        <button id="modal-close-button" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs - Load as modules to support 'import' -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"></script>
+
+    <!-- Your application script - now also a module -->
+    <script type="module">
+        // Import Firebase functions directly from the modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Your Firebase Configuration - REPLACE WITH YOUR ACTUAL CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyAcpI1bYy3jk9O6eMAvjfrWslagIT273PI",
+            authDomain: "canopy-a3a12.firebaseapp.com",
+            projectId: "canopy-a3a12",
+            storageBucket: "canopy-a3a12.firebasestorage.app",
+            messagingSenderId: "401546799489",
+            appId: "1:401546799489:web:e92d6229eb84de4eca2080",
+            measurementId: "G-ZXNHTRJM7M"
+        };
+
+        const __app_id = "cipher-subscriptions-comp-id"; // Unique ID for this specific app instance's data collection
+
+        // Initialize Firebase services
+        let app = initializeApp(firebaseConfig);
+        let auth = getAuth(app);
+        let db = getFirestore(app);
+
+        let currentUserId = '';
+        let currentUserEmail = '';
+        let currentEditingId = null;
+
+        // --- DOM Elements ---
+        const authSection = document.getElementById('auth-section');
+        const userStatusElement = document.getElementById('user-status');
+        const signinGoogleButton = document.getElementById('signin-google');
+        const signoutGoogleButton = document.getElementById('signout-google');
+        const entryForm = document.getElementById('entry-form');
+        const entryIdInput = document.getElementById('entry-id');
+        const nameInput = document.getElementById('name');
+        const vendorInput = document.getElementById('vendor');
+        const keyInput = document.getElementById('key');
+        const costInput = document.getElementById('cost');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const willRenewCheckbox = document.getElementById('willRenew');
+        const renewalReminderDateGroup = document.getElementById('renewalReminderDateGroup');
+        const renewalReminderDateInput = document.getElementById('renewalReminderDate');
+        const notResponsibleCheckbox = document.getElementById('notResponsible');
+        const responsiblePersonEmailGroup = document.getElementById('responsiblePersonEmailGroup');
+        const responsiblePersonEmailInput = document.getElementById('responsiblePersonEmail');
+        const notesTextarea = document.getElementById('notes');
+        const submitButton = document.getElementById('submit-button');
+        const cancelEditButton = document.getElementById('cancel-edit-button');
+        const licensesListContainer = document.getElementById('licenses-list-container');
+        const noLicensesMessage = document.getElementById('no-licenses-message');
+        const licensesTable = document.getElementById('licenses-table');
+        const licensesTableBody = document.getElementById('licenses-table-body');
+        const customModal = document.getElementById('custom-modal');
+        const modalContentElement = document.getElementById('modal-content');
+        const modalCloseButton = document.getElementById('modal-close-button');
+
+        // --- Modal Functions ---
+        function showCustomModal(message) {
+            console.log("Showing modal:", message); // Debugging
+            modalContentElement.textContent = message;
+            customModal.classList.remove('hidden');
+        }
+
+        function hideCustomModal() {
+            console.log("Hiding modal."); // Debugging
+            customModal.classList.add('hidden');
+        }
+
+        // --- Form Handling ---
+        function resetForm() {
+            console.log("Resetting form."); // Debugging
+            entryForm.reset();
+            entryIdInput.value = '';
+            submitButton.textContent = 'Add Entry';
+            cancelEditButton.classList.add('hidden');
+            // Ensure conditional groups are hidden when resetting
+            renewalReminderDateGroup.style.display = 'none';
+            renewalReminderDateInput.removeAttribute('required');
+            responsiblePersonEmailGroup.style.display = 'none';
+            responsiblePersonEmailInput.removeAttribute('required');
+            currentEditingId = null;
+        }
+
+        function validateForm() {
+            console.log("Validating form..."); // Debugging
+            if (!nameInput.value || !startDateInput.value) {
+                showCustomModal('Name and Start Date are required fields.');
+                return false;
+            }
+            if (endDateInput.value && new Date(endDateInput.value) < new Date(startDateInput.value)) {
+                showCustomModal('End Date cannot be before Start Date.');
+                return false;
+            }
+            if (willRenewCheckbox.checked && !renewalReminderDateInput.value) {
+                showCustomModal('Renewal Reminder Date is mandatory if "Will it auto renew?" is checked.');
+                return false;
+            }
+            if (renewalReminderDateInput.value && endDateInput.value && new Date(renewalReminderDateInput.value) > new Date(endDateInput.value)) {
+                showCustomModal('Reminder Date cannot be after End Date.');
+                return false;
+            }
+            if (notResponsibleCheckbox.checked && !responsiblePersonEmailInput.value) {
+                showCustomModal('Email of responsible person is required if you are not responsible for this account.');
+                return false;
+            }
+            if (responsiblePersonEmailInput.value && !/\S+@\S+\.\S+/.test(responsiblePersonEmailInput.value)) {
+                showCustomModal('Please enter a valid email address for the responsible person.');
+                return false;
+            }
+            console.log("Form validation successful."); // Debugging
+            return true;
+        }
+
+        entryForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // IMPORTANT: Prevent default form submission (page reload)
+            console.log("Form submitted. Preventing default action."); // Debugging
+
+            if (!validateForm()) {
+                console.log("Form validation failed."); // Debugging
+                return;
+            }
+            if (!db || !currentUserId) {
+                showCustomModal('Database not ready or user not authenticated. Please try signing in with Google.'); // Updated message
+                console.error("Database or User not ready:", {db: db, userId: currentUserId}); // Debugging
+                return;
+            }
+
+            const dataToSave = {
+                name: nameInput.value,
+                key: keyInput.value,
+                startDate: startDateInput.value,
+                endDate: endDateInput.value,
+                cost: parseFloat(costInput.value) || 0,
+                vendor: vendorInput.value,
+                notes: notesTextarea.value,
+                renewalReminderDate: renewalReminderDateInput.value,
+                willRenew: willRenewCheckbox.checked,
+                notResponsible: notResponsibleCheckbox.checked,
+                responsiblePersonEmail: responsiblePersonEmailInput.value,
+                userId: currentUserId,
+            };
+
+            try {
+                if (currentEditingId) {
+                    console.log("Updating entry:", dataToSave); // Debugging
+                    const docRef = doc(db, `artifacts/${__app_id}/public/data/softwareLicenses`, currentEditingId);
+                    await updateDoc(docRef, dataToSave);
+                    showCustomModal('Entry updated successfully!');
+                } else {
+                    console.log("Adding new entry:", dataToSave); // Debugging
+                    await addDoc(collection(db, `artifacts/${__app_id}/public/data/softwareLicenses`), dataToSave);
+                    showCustomModal('Entry added successfully!');
+                }
+                resetForm();
+            } catch (error) {
+                console.error("Error saving entry:", error); // Debugging
+                showCustomModal(`Failed to save entry: ${error.message}`);
+            }
+        });
+
+        cancelEditButton.addEventListener('click', resetForm);
+
+        // --- Event listeners for conditional display (moved to top-level scope) ---
+        willRenewCheckbox.addEventListener('change', () => {
+            console.log("Will Renew checkbox changed:", willRenewCheckbox.checked); // Debugging
+            if (willRenewCheckbox.checked) {
+                renewalReminderDateGroup.style.display = 'block';
+                renewalReminderDateInput.setAttribute('required', 'true');
+            } else {
+                renewalReminderDateGroup.style.display = 'none';
+                renewalReminderDateInput.removeAttribute('required');
+                renewalReminderDateInput.value = ''; // Clear value if not renewing
+            }
+        });
+
+        notResponsibleCheckbox.addEventListener('change', () => {
+            console.log("Not Responsible checkbox changed:", notResponsibleCheckbox.checked); // Debugging
+            if (notResponsibleCheckbox.checked) {
+                responsiblePersonEmailGroup.style.display = 'block';
+                responsiblePersonEmailInput.setAttribute('required', 'true');
+            } else {
+                responsiblePersonEmailGroup.style.display = 'none';
+                responsiblePersonEmailInput.removeAttribute('required');
+                responsiblePersonEmailInput.value = ''; // Clear value if responsible
+            }
+        });
+
+        // --- Date Helper ---
+        function getDaysUntilRenewal(dateStr) {
+            if (!dateStr) return null;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const targetDate = new Date(dateStr);
+            targetDate.setHours(0, 0, 0, 0);
+
+            const diffTime = targetDate.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        // --- Status Display ---
+        function getReminderStatusHtml(license) {
+            if (license.willRenew) {
+                const daysUntilReminder = getDaysUntilRenewal(license.renewalReminderDate);
+                if (daysUntilReminder !== null) {
+                    if (daysUntilReminder < 0) return '<span class="text-red-500 font-semibold">Renewal Reminder Passed</span>';
+                    if (daysUntilReminder <= 30) return `<span class="text-orange-500 font-semibold">${daysUntilReminder} days until renewal</span>`;
+                    return `<span class="text-green-500">${daysUntilReminder} days until reminder</span>`;
+                }
+                return 'N/A';
+            } else {
+                const daysUntilExpiry = getDaysUntilRenewal(license.endDate);
+                if (daysUntilExpiry !== null) {
+                    if (daysUntilExpiry < 0) return '<span class="text-red-500 font-semibold">Expired</span>';
+                    if (daysUntilExpiry <= 30) return `<span class="text-orange-500 font-semibold">${daysUntilExpiry} days until expiry</span>`;
+                    return `<span class="text-blue-500">${daysUntilExpiry} days until expiry</span>`;
+                }
+                return 'N/A';
+            }
+        }
+
+        function getAutoRenewTagHtml(willRenew) {
+            if (willRenew) {
+                return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 ml-2">Auto Renew</span>';
+            } else {
+                return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ml-2">No Auto Renew</span>';
+            }
+        }
+
+        // --- Render Licenses ---
+        function renderLicenses(licenses) {
+            console.log("Rendering licenses:", licenses.length, "items."); // Debugging
+            licensesTableBody.innerHTML = ''; // Clear existing rows
+            if (licenses.length === 0) {
+                noLicensesMessage.classList.remove('hidden');
+                licensesTable.classList.add('hidden');
+            } else {
+                noLicensesMessage.classList.add('hidden');
+                licensesTable.classList.remove('hidden');
+                licenses.forEach(license => {
+                    const row = licensesTableBody.insertRow();
+                    row.className = 'hover:bg-gray-50';
+
+                    const startDateStr = license.startDate ? new Date(license.startDate).toLocaleDateString() : 'N/A';
+                    const endDateStr = license.endDate ? new Date(license.endDate).toLocaleDateString() : 'N/A';
+                    const reminderDateStr = license.renewalReminderDate ? new Date(license.renewalReminderDate).toLocaleDateString() : 'N/A';
+                    const responsiblePerson = license.notResponsible ? `Other: ${license.responsiblePersonEmail}` : `You (${currentUserEmail || 'Not Signed In'})`;
+
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${license.name || ''}</div>
+                            ${license.key ? `<div class="text-xs text-gray-500 break-all">Key: ${license.key}</div>` : ''}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${license.vendor || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">£${(license.cost || 0).toFixed(2)}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            <div class="text-xs text-gray-600">Start: ${startDateStr}</div>
+                            <div class="text-xs text-gray-600">End: ${endDateStr}</div>
+                            ${license.willRenew ? `<div class="text-xs text-gray-600">Reminder: ${reminderDateStr}</div>` : ''}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm">
+                                ${getReminderStatusHtml(license)}
+                                ${getAutoRenewTagHtml(license.willRenew)}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${responsiblePerson}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button data-id="${license.id}" data-action="edit" class="text-indigo-600 hover:text-indigo-900 mr-4 transition duration-150 ease-in-out">
+                                Edit
+                            </button>
+                            <button data-id="${license.id}" data-action="delete" class="text-red-600 hover:text-red-900 transition duration-150 ease-in-out">
+                                Delete
+                            </button>
+                        </td>
+                    `;
+                });
+
+                // Attach event listeners to new buttons
+                licensesTableBody.querySelectorAll('button[data-action="edit"]').forEach(button => {
+                    button.addEventListener('click', (e) => handleEdit(e.target.dataset.id));
+                });
+                licensesTableBody.querySelectorAll('button[data-action="delete"]').forEach(button => {
+                    button.addEventListener('click', (e) => handleDelete(e.target.dataset.id));
+                });
+            }
+        }
+
+        async function handleEdit(id) {
+            console.log("Editing entry with ID:", id); // Debugging
+            currentEditingId = id;
+            submitButton.textContent = 'Update Entry';
+            cancelEditButton.classList.remove('hidden');
+
+            try {
+                // Accessing firestore methods directly from firestore instance
+                const docRef = doc(db, `artifacts/${__app_id}/public/data/softwareLicenses`, id);
+                const docSnap = await docRef.get(); // Correct way to get doc reference and then snapshot
+                if (docSnap.exists()) { // Use .exists() method
+                    const data = docSnap.data();
+                    nameInput.value = data.name || '';
+                    vendorInput.value = data.vendor || '';
+                    keyInput.value = data.key || '';
+                    costInput.value = data.cost || '';
+                    startDateInput.value = data.startDate || '';
+                    endDateInput.value = data.endDate || '';
+                    willRenewCheckbox.checked = data.willRenew || false;
+                    renewalReminderDateInput.value = data.renewalReminderDate || '';
+                    notResponsibleCheckbox.checked = data.notResponsible || false;
+                    responsiblePersonEmailInput.value = data.responsiblePersonEmail || '';
+                    notesTextarea.value = data.notes || '';
+
+                    // Trigger change listeners to show/hide conditional fields
+                    willRenewCheckbox.dispatchEvent(new Event('change'));
+                    notResponsibleCheckbox.dispatchEvent(new Event('change'));
+
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    console.warn("Document not found for edit:", id); // Debugging
+                }
+            } catch (error) {
+                console.error("Error fetching for edit:", error); // Debugging
+                showCustomModal(`Failed to load entry for edit: ${error.message}`);
+            }
+        }
+
+        async function handleDelete(id) {
+            console.log("Deleting entry with ID:", id); // Debugging
+            if (!db || !currentUserId) {
+                showCustomModal('Database not ready or user not authenticated.');
+                return;
+            }
+            try {
+                // Accessing firestore methods directly from firestore instance
+                await deleteDoc(doc(db, `artifacts/${__app_id}/public/data/softwareLicenses`, id));
+                showCustomModal('Entry deleted successfully!');
+            } catch (error) {
+                console.error("Error deleting entry:", error); // Debugging
+                showCustomModal(`Failed to delete entry: ${error.message}`);
+            }
+        }
+
+        // --- Firebase Auth Listeners and Functions ---
+        function setupAuthListener() {
+            onAuthStateChanged(auth, (user) => { // Removed async here as signInAnonymously is removed
+                if (user) {
+                    currentUserId = user.uid;
+                    currentUserEmail = user.email || '';
+                    userStatusElement.textContent = `Signed in as: ${currentUserEmail}`;
+                    signinGoogleButton.classList.add('hidden');
+                    signoutGoogleButton.classList.remove('hidden');
+                    console.log("User signed in:", currentUserId, currentUserEmail); // Debugging
+                    startFirestoreListener(); // Start listening to data for this user
+                } else {
+                    currentUserId = '';
+                    currentUserEmail = '';
+                    userStatusElement.textContent = `Not Signed In. Please sign in with Google to manage subscriptions.`; // Clear status and prompt sign-in
+                    signinGoogleButton.classList.remove('hidden');
+                    signoutGoogleButton.classList.add('hidden');
+                    console.log("No user signed in. Awaiting Google sign-in."); // Debugging
+                    // If no user, stop any existing Firestore listener (data should be empty)
+                    if (unsubscribeFirestore) {
+                        unsubscribeFirestore();
+                        unsubscribeFirestore = null;
+                        renderLicenses([]); // Clear the displayed licenses
+                    }
+                }
+                // Update loading message after auth state is determined
+                if (noLicensesMessage.textContent === 'Loading licenses...') { // Only if initial loading message is still there
+                    noLicensesMessage.textContent = 'No software or subscriptions added yet. Add one above!';
+                }
+            });
+        }
+
+        // --- Firestore Realtime Listener ---
+        let unsubscribeFirestore = null; // To hold the unsubscribe function
+
+        function startFirestoreListener() {
+            if (unsubscribeFirestore) {
+                unsubscribeFirestore(); // Unsubscribe from previous listener if exists
+                console.log("Unsubscribed from previous Firestore listener."); // Debugging
+            }
+            if (db && currentUserId) {
+                console.log("Starting new Firestore listener for user:", currentUserId); // Debugging
+                // Using Firestore functions imported directly
+                const licensesCollectionRef = collection(db, `artifacts/${__app_id}/public/data/softwareLicenses`);
+                const q = query(licensesCollectionRef, where('userId', '==', currentUserId)); // Filter by current user ID
+
+                unsubscribeFirestore = onSnapshot(q, snapshot => {
+                    console.log("Firestore snapshot received:", snapshot.docs.length, "documents."); // Debugging
+                    const fetchedLicenses = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    fetchedLicenses.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                    renderLicenses(fetchedLicenses);
+                }, error => {
+                    console.error("Error listening to licenses:", error); // Debugging
+                    showCustomModal(`Error fetching real-time updates: ${error.message}`);
+                });
+            } else {
+                 console.log("Cannot start Firestore listener: DB or userId not ready.", {db: db, currentUserId: currentUserId}); // Debugging
+            }
+        }
+
+
+        // --- Initial Load and Event Attachments (ensured all elements are ready) ---
+        window.onload = function () {
+            console.log("Window loaded. Initializing app."); // Debugging
+
+            // Log current state to ensure Firebase is indeed initialized
+            console.log("Firebase services after direct import:", {app: app, auth: auth, db: db});
+
+            // Attach common event listeners that don't depend on auth state
+            // Re-attached explicitly inside window.onload for robustness
+            modalCloseButton.addEventListener('click', hideCustomModal);
+
+            signinGoogleButton.addEventListener('click', async () => {
+                console.log("Google Sign-in button clicked."); // Debugging
+                const provider = new GoogleAuthProvider(); // Use the imported GoogleAuthProvider
+                try {
+                    // It's possible this part fails due to CSP in embeds.
+                    await signInWithPopup(auth, provider); // Use the imported signInWithPopup
+                    showCustomModal('Signed in with Google successfully!');
+                } catch (error) {
+                    console.error("Google Sign-In Error during click:", error); // Debugging
+                    let errorMessage = 'Google Sign-In failed.';
+                    if (error.code) { // Firebase auth error codes
+                        errorMessage += ` Error: ${error.code.replace('auth/', '').replace(/-/g, ' ')}`;
+                        if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request' || error.code === 'auth/operation-not-allowed') {
+                            errorMessage += `. This is often due to browser pop-up blockers or security restrictions in embedded environments (like Google Sites). Please try running the HTML file directly or check your browser settings.`;
+                        } else if (error.code === 'auth/unauthorized-domain') { // Specific error for unauthorized domain
+                            errorMessage += `. This means the domain you are running this app from (${window.location.origin}) is not authorized in your Firebase project. Please add it in Firebase Console > Authentication > Settings > Authorized domains.`;
+                        }
+                    } else if (error.message) {
+                        errorMessage += ` Message: ${error.message}`;
+                    }
+                    showCustomModal(errorMessage);
+                }
+            });
+
+            signoutGoogleButton.addEventListener('click', async () => {
+                console.log("Sign Out button clicked."); // Debugging
+                try {
+                    await signOut(auth); // Use the imported signOut
+                    showCustomModal('Signed out successfully.');
+                } catch (error) {
+                    console.error("Sign Out Error during click:", error); // Debugging
+                    showCustomModal(`Sign Out failed: ${error.message}`);
+                }
+            });
+
+            // Set up the Firebase Authentication listener after everything is initialized
+            setupAuthListener();
+
+            // Manually trigger initial state for conditional fields
+            // These lines are crucial for initial visibility
+            willRenewCheckbox.dispatchEvent(new Event('change'));
+            notResponsibleCheckbox.dispatchEvent(new Event('change'));
+            console.log("Conditional checkbox states dispatched."); // Debugging
+
+        };
+    </script>
+</body>
+</html>
