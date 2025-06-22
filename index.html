@@ -426,56 +426,56 @@
         }
 
         // --- Render Licences ---
-        function renderLicenses(licenses) {
-        console.log("Rendering licenses:", licenses.length, "items.");
-        licensesTableBody.innerHTML = '';
-        if (licenses.length === 0) {
-            noLicensesMessage.classList.remove('hidden');
-            licensesTable.classList.add('hidden');
+        function renderLicences(licences) {
+        console.log("Rendering licences:", licences.length, "items.");
+        licencesTableBody.innerHTML = '';
+        if (licences.length === 0) {
+            noLicencesMessage.classList.remove('hidden');
+            licencesTable.classList.add('hidden');
         } else {
-            noLicensesMessage.classList.add('hidden');
-            licensesTable.classList.remove('hidden');
-            licenses.forEach(license => {
-                const row = licensesTableBody.insertRow();
+            noLicencesMessage.classList.add('hidden');
+            licencesTable.classList.remove('hidden');
+            licences.forEach(licence => {
+                const row = licencesTableBody.insertRow();
                 row.className = 'hover:bg-gray-50';
 
-                const startDateStr = license.startDate ? new Date(license.startDate).toLocaleDateString() : 'N/A';
-                const endDateStr = license.endDate ? new Date(license.endDate).toLocaleDateString() : 'N/A';
-                const reminderDateStr = license.renewalReminderDate ? new Date(license.renewalReminderDate).toLocaleDateString() : 'N/A';
-                const responsiblePerson = license.notResponsible ? `Other: ${license.responsiblePersonEmail}` : `You (${currentUserEmail || 'Not Signed In'})`;
+                const startDateStr = licence.startDate ? new Date(licence.startDate).toLocaleDateString() : 'N/A';
+                const endDateStr = licence.endDate ? new Date(licence.endDate).toLocaleDateString() : 'N/A';
+                const reminderDateStr = licence.renewalReminderDate ? new Date(licence.renewalReminderDate).toLocaleDateString() : 'N/A';
+                const responsiblePerson = licence.notResponsible ? `Other: ${licence.responsiblePersonEmail}` : `You (${currentUserEmail || 'Not Signed In'})`;
 
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">${license.name || ''}</div>
-                        ${license.key ? `<div class="text-xs text-gray-500 break-all">Key: ${license.key}</div>` : ''}
+                        <div class="text-sm font-medium text-gray-900">${licence.name || ''}</div>
+                        ${licence.key ? `<div class="text-xs text-gray-500 break-all">Key: ${licence.key}</div>` : ''}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">${license.vendor || ''}</div>
+                        <div class="text-sm text-gray-900">${licence.vendor || ''}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">£${(license.cost || 0).toFixed(2)}</div>
+                        <div class="text-sm text-gray-900">£${(licence.cost || 0).toFixed(2)}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                         <div class="text-xs text-gray-600">Start: ${startDateStr}</div>
                         <div class="text-xs text-gray-600">End: ${endDateStr}</div>
-                        ${license.willRenew ? `<div class="text-xs text-gray-600">Reminder: ${reminderDateStr}</div>` : ''}
+                        ${licence.willRenew ? `<div class="text-xs text-gray-600">Reminder: ${reminderDateStr}</div>` : ''}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm">
-                            ${getReminderStatusHtml(license)}
-                            ${getAutoRenewTagHtml(license.willRenew)}
+                            ${getReminderStatusHtml(licence)}
+                            ${getAutoRenewTagHtml(licence.willRenew)}
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm text-gray-900">${responsiblePerson}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-normal text-xs text-gray-600">
-                        ${license.notes ? `<div class="line-clamp-2">${license.notes}</div>` : ''}
+                        ${licence.notes ? `<div class="line-clamp-2">${licence.notes}</div>` : ''}
                     </td> <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button data-id="${license.id}" data-action="edit" class="text-indigo-600 hover:text-indigo-900 mr-4 transition duration-150 ease-in-out">
+                        <button data-id="${licence.id}" data-action="edit" class="text-indigo-600 hover:text-indigo-900 mr-4 transition duration-150 ease-in-out">
                             Edit
                         </button>
-                        <button data-id="${license.id}" data-action="delete" class="text-red-600 hover:text-red-900 transition duration-150 ease-in-out">
+                        <button data-id="${licence.id}" data-action="delete" class="text-red-600 hover:text-red-900 transition duration-150 ease-in-out">
                             Delete
                         </button>
                     </td>
